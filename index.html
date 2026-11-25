@@ -109,6 +109,10 @@ main{position:relative;z-index:5}
 @keyframes sh{to{background-position:-200% 0}}
 .recon figcaption{font-size:var(--step-small);color:var(--muted);margin-top:.45rem;font-style:italic}
 .in .card>.recon{opacity:1}
+.recon .pb{position:absolute;left:0;right:0;top:0;opacity:var(--t,0);transform:scale(calc(1 + var(--t,0) * .025));transform-origin:50% 60%}
+.recon img.pb{transition:none}
+.recon .tag{display:none;position:absolute;left:.6rem;top:.6rem;z-index:2;background:color-mix(in srgb,var(--bg) 78%,transparent);color:var(--accent);font-size:var(--step-small);padding:.25rem .6rem;letter-spacing:.02em}
+.recon.pair .tag{display:block}
 .find{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:.8rem 0;margin:var(--space-3) 0!important;font-size:.95em}
 .find b{display:block;font-weight:600;color:var(--accent);font-size:var(--step-small);margin-bottom:.15rem}
 blockquote{margin:var(--space-3) 0;padding:0 0 0 1.2rem;border-left:1px solid var(--accent)}
@@ -400,6 +404,41 @@ addEventListener('scroll',update,{passive:true});
 addEventListener('resize',()=>{measure();update()});
 addEventListener('load',()=>{measure();update()});
 
+const caps=[
+ 'Hoy: la Ciudad Vieja dentro de sus murallas, con la Cúpula de la Roca y el Santo Sepulcro',
+ 'Hacia 1537: los canteros de Solimán levantan las nuevas murallas',
+ 'Hacia 1149: el Santo Sepulcro de los cruzados, con su campanario',
+ 'Hacia 691: la Cúpula de la Roca recién terminada sobre la explanada',
+ 'Hacia 335: la rotonda de la Anástasis y la basílica junto al Cardo',
+ 'Hacia 135: Aelia Capitolina, con el templo romano sobre el Calvario',
+ 'Hacia el año 30: el Templo de Herodes sobre su gran explanada',
+ 'Año 586 a. C.: Jerusalén arde ante el ejército de Babilonia',
+ 'Hacia 701 a. C.: la ciudad de Ezequías, la piscina de Siloé y el túnel bajo la colina',
+ 'Hacia 1000 a. C.: la pequeña Ciudad de David sobre su colina',
+ 'Hacia 1800 a. C.: Salén, aldea fortificada junto al manantial',
+ 'El manantial de Guijón en su cueva, el origen de todo',
+ 'La nueva Jerusalén que desciende del cielo (Ap 21)'];
+const tags=[['Se excava','Vive hoy'],['Se construye','Se desgasta'],['Se construye','Cae'],['Se construye','Se derriba'],['Se construye','Arde'],['Se construye','Se descubre'],['Se construye','Arde'],['El asedio','La ceniza'],['Se excava','El asedio'],['La conquista','Se construye'],['Se construye','La ciudad'],['El manantial','Los primeros muros'],['Las ruinas','La ciudad que baja']];
+const cards=[...layers.map(s=>s.querySelector('.card')),document.querySelector('#fin .card')];
+const figs=cards.map((c,i)=>{const f=document.createElement('figure');f.className='recon';
+ f.innerHTML='<div class="ph"><span>Cargando la época…</span></div><span class="tag"></span><figcaption></figcaption>';
+ f.querySelector('figcaption').textContent=caps[i];c.querySelector('h2').after(f);
+ const a=new Image(),b=new Image();a.className='pa';b.className='pb';a.decoding=b.decoding='async';
+ a.alt=caps[i]+' (antes)';b.alt=caps[i]+' (después)';let n=0,ok=0;
+ const fin=()=>{if(ok===2){f.querySelector('.ph').replaceWith(a);a.after(b);f.classList.add('pair');f.dataset.t0=tags[i][0];f.dataset.t1=tags[i][1];requestAnimationFrame(()=>{a.classList.add('on');fade()});return}
+  const one=new Image();one.alt=caps[i];
+  one.onload=()=>{f.querySelector('.ph').replaceWith(one);requestAnimationFrame(()=>one.classList.add('on'))};
+  one.onerror=()=>{f.dataset.need='3d';f.querySelector('figcaption').textContent=caps[i]+' · reconstrucción orientativa';dispatchEvent(new Event('need3d'));
+   setTimeout(()=>{if(root.classList.contains('no-3d')&&f.querySelector('.ph'))f.remove()},6000)};
+  one.src='img/capa-'+i+'.jpg'};
+ a.onload=b.onload=()=>{ok++;if(++n===2)fin()};a.onerror=b.onerror=()=>{if(++n===2)fin()};
+ a.src='img/capa-'+i+'-a.jpg';b.src='img/capa-'+i+'-b.jpg';return f});
+window.reconFigs=figs;window.reconCaps=caps;
+function fade(){const vh=innerHeight;for(const f of figs){if(!f.classList.contains('pair'))continue;const r=f.getBoundingClientRect();
+ if(r.bottom<-300||r.top>vh+300)continue;let t=(.74-(r.top+r.height/2)/vh)/.42;t=Math.min(1,Math.max(0,t));t=t*t*(3-2*t);
+ f.style.setProperty('--t',t.toFixed(3));const tag=t<.5?f.dataset.t0:f.dataset.t1;const el=f.querySelector('.tag');if(el.textContent!==tag)el.textContent=tag}}
+addEventListener('scroll',fade,{passive:true});addEventListener('resize',fade);
+measure();update();
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in')}),{threshold:.25});
 secs.forEach(s=>io.observe(s));
 if(reduce) secs.forEach(s=>s.classList.add('in'));
@@ -602,26 +641,7 @@ function loop(){
 }
 requestAnimationFrame(loop);
 /* ===== Reconstrucciones: cómo era en su época ===== */
-const caps=[
- 'Hoy: la Ciudad Vieja dentro de sus murallas, con la Cúpula de la Roca y el Santo Sepulcro',
- 'Hacia 1537: los canteros de Solimán levantan las nuevas murallas',
- 'Hacia 1149: el Santo Sepulcro de los cruzados, con su campanario',
- 'Hacia 691: la Cúpula de la Roca recién terminada sobre la explanada',
- 'Hacia 335: la rotonda de la Anástasis y la basílica junto al Cardo',
- 'Hacia 135: Aelia Capitolina, con el templo romano sobre el Calvario',
- 'Hacia el año 30: el Templo de Herodes sobre su gran explanada',
- 'Año 586 a. C.: Jerusalén arde ante el ejército de Babilonia',
- 'Hacia 701 a. C.: la ciudad de Ezequías, la piscina de Siloé y el túnel bajo la colina',
- 'Hacia 1000 a. C.: la pequeña Ciudad de David sobre su colina',
- 'Hacia 1800 a. C.: Salén, aldea fortificada junto al manantial',
- 'El manantial de Guijón en su cueva, el origen de todo',
- 'La nueva Jerusalén que desciende del cielo (Ap 21)'];
-const cards=[...document.querySelectorAll('main>section[data-color] .card'),document.querySelector('#fin .card')];
-const figs=cards.map((c,i)=>{const f=document.createElement('figure');f.className='recon';
- f.innerHTML='<div class="ph"><span>Reconstruyendo la época…</span></div><figcaption></figcaption>';
- f.querySelector('figcaption').textContent=caps[i]+' · reconstrucción orientativa';
- const h=c.querySelector('h2');h.after(f);return f});
-dispatchEvent(new Event('resize'));
+const figs=window.reconFigs||[];const caps=window.reconCaps||[];
 
 const rl=new THREE.TextureLoader();
 const texCache={};
@@ -816,17 +836,16 @@ function renderRecon(i){
  R.render(sc,camera);const url=R.domElement.toDataURL('image/jpeg',.86);disposeScene(sc);return url}
 function place(i,src){const f=figs[i];const img=new Image();img.alt=caps[i];img.decoding='async';img.src=src;
  img.onload=()=>{f.querySelector('.ph')?.replaceWith(img);requestAnimationFrame(()=>img.classList.add('on'))}}
-const done=new Set();
-function queue(){
+const done=new Set();let texReady=false,busy=false;
+function queue(){if(!texReady||busy)return;busy=true;step()}
+function step(){
  const cur=Math.max(0,(window.dig?.active??0));
- const order=[...Array(builders2.length).keys()].filter(i=>!done.has(i)).sort((a,b)=>Math.abs(a-cur)-Math.abs(b-cur));
- if(!order.length)return;const i=order[0];done.add(i);
- const own=new Image();own.onload=()=>{place(i,own.src);setTimeout(queue,30)};
- own.onerror=()=>{try{place(i,renderRecon(i))}catch(e){console.warn(e);figs[i].remove()}setTimeout(queue,120)};
- own.src='img/capa-'+i+'.jpg';
-}
+ const order=figs.map((f,i)=>i).filter(i=>figs[i].dataset.need==='3d'&&!done.has(i)).sort((a,b)=>Math.abs(a-cur)-Math.abs(b-cur));
+ if(!order.length){busy=false;return}const i=order[0];done.add(i);
+ try{place(i,renderRecon(i))}catch(e){console.warn(e);figs[i].remove()}setTimeout(step,120)}
+addEventListener('need3d',queue);
 const allTex=['L0','L1','L5','L6','L7','L8','L9','L10','L11','lime','ground'];
-let pending=0;allTex.forEach(n=>{pending+=2;const a=new Image(),b=new Image();imgCache[n+'_c']=a;imgCache[n+'_n']=b;a.onload=a.onerror=b.onload=b.onerror=()=>{if(--pending===0)setTimeout(queue,400)};a.src='tex/'+n+'_c.jpg';b.src='tex/'+n+'_n.jpg'});
+let pending=0;allTex.forEach(n=>{pending+=2;const a=new Image(),b=new Image();imgCache[n+'_c']=a;imgCache[n+'_n']=b;a.onload=a.onerror=b.onload=b.onerror=()=>{if(--pending===0){texReady=true;setTimeout(queue,400)}};a.src='tex/'+n+'_c.jpg';b.src='tex/'+n+'_n.jpg'});
 
 }
 }
