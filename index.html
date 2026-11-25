@@ -111,8 +111,11 @@ main{position:relative;z-index:5}
 .in .card>.recon{opacity:1}
 .recon .pb{position:absolute;left:0;right:0;top:0;opacity:var(--t,0);transform:scale(calc(1 + var(--t,0) * .025));transform-origin:50% 60%}
 .recon img.pb{transition:none}
-.recon .tag{display:none;position:absolute;left:.6rem;top:.6rem;z-index:2;background:color-mix(in srgb,var(--bg) 78%,transparent);color:var(--accent);font-size:var(--step-small);padding:.25rem .6rem;letter-spacing:.02em}
-.recon.pair .tag{display:block}
+.recon .tag{display:none;order:-1;color:var(--accent);font-size:var(--step-small);margin:0 0 .45rem;letter-spacing:.02em;min-height:1.3em}
+.recon{display:flex;flex-direction:column}
+.recon.photo .tag{display:block}
+#evo{position:fixed;inset:0;width:100%;height:100%;z-index:6;pointer-events:none}
+.evo .recon.photo img{visibility:hidden}
 .find{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:.8rem 0;margin:var(--space-3) 0!important;font-size:.95em}
 .find b{display:block;font-weight:600;color:var(--accent);font-size:var(--step-small);margin-bottom:.15rem}
 blockquote{margin:var(--space-3) 0;padding:0 0 0 1.2rem;border-left:1px solid var(--accent)}
@@ -420,23 +423,22 @@ const caps=[
  'La nueva Jerusalén que desciende del cielo (Ap 21)'];
 const tags=[['Se excava','Vive hoy'],['Se construye','Se desgasta'],['Se construye','Cae'],['Se construye','Se derriba'],['Se construye','Arde'],['Se construye','Se descubre'],['Se construye','Arde'],['El asedio','La ceniza'],['Se excava','El asedio'],['La conquista','Se construye'],['Se construye','La ciudad'],['El manantial','Los primeros muros'],['Las ruinas','La ciudad que baja']];
 const cards=[...layers.map(s=>s.querySelector('.card')),document.querySelector('#fin .card')];
+const names=['Hoy','Los otomanos','Los cruzados','El islam temprano','Los bizantinos','Aelia Capitolina','El tiempo de Jesús','Babilonia','Ezequías','David','Salén','El manantial','La nueva Jerusalén'];
 const figs=cards.map((c,i)=>{const f=document.createElement('figure');f.className='recon';
  f.innerHTML='<div class="ph"><span>Cargando la época…</span></div><span class="tag"></span><figcaption></figcaption>';
  f.querySelector('figcaption').textContent=caps[i];c.querySelector('h2').after(f);
- const a=new Image(),b=new Image();a.className='pa';b.className='pb';a.decoding=b.decoding='async';
- a.alt=caps[i]+' (antes)';b.alt=caps[i]+' (después)';let n=0,ok=0;
- const fin=()=>{if(ok===2){f.querySelector('.ph').replaceWith(a);a.after(b);f.classList.add('pair');f.dataset.t0=tags[i][0];f.dataset.t1=tags[i][1];requestAnimationFrame(()=>{a.classList.add('on');fade()});return}
-  const one=new Image();one.alt=caps[i];
-  one.onload=()=>{f.querySelector('.ph').replaceWith(one);requestAnimationFrame(()=>one.classList.add('on'))};
-  one.onerror=()=>{f.dataset.need='3d';f.querySelector('figcaption').textContent=caps[i]+' · reconstrucción orientativa';dispatchEvent(new Event('need3d'));
-   setTimeout(()=>{if(root.classList.contains('no-3d')&&f.querySelector('.ph'))f.remove()},6000)};
-  one.src='img/capa-'+i+'.jpg'};
- a.onload=b.onload=()=>{ok++;if(++n===2)fin()};a.onerror=b.onerror=()=>{if(++n===2)fin()};
- a.src='img/capa-'+i+'-a.jpg';b.src='img/capa-'+i+'-b.jpg';return f});
+ const a=new Image();a.className='pa';a.decoding='async';a.alt=caps[i];
+ a.onload=()=>{f.querySelector('.ph').replaceWith(a);f.classList.add('photo');requestAnimationFrame(()=>{a.classList.add('on');fade()})};
+ a.onerror=()=>{f.dataset.need='3d';f.querySelector('figcaption').textContent=caps[i]+' · reconstrucción orientativa';dispatchEvent(new Event('need3d'));
+  setTimeout(()=>{if(root.classList.contains('no-3d')&&f.querySelector('.ph'))f.remove()},6000)};
+ a.src='img/capa-'+i+'-a.jpg';return f});
 window.reconFigs=figs;window.reconCaps=caps;
-function fade(){const vh=innerHeight;for(const f of figs){if(!f.classList.contains('pair'))continue;const r=f.getBoundingClientRect();
- if(r.bottom<-300||r.top>vh+300)continue;let t=(.74-(r.top+r.height/2)/vh)/.42;t=Math.min(1,Math.max(0,t));t=t*t*(3-2*t);
- f.style.setProperty('--t',t.toFixed(3));const tag=t<.5?f.dataset.t0:f.dataset.t1;const el=f.querySelector('.tag');if(el.textContent!==tag)el.textContent=tag}}
+/* progreso de la evolución de cada imagen: 0 al entrar en pantalla, 1 al salir por arriba */
+function fade(){const vh=innerHeight;figs.forEach((f,i)=>{if(!f.classList.contains('photo'))return;const r=f.getBoundingClientRect();
+ if(r.bottom<-300||r.top>vh+300)return;let t=(.9-(r.top+r.height/2)/vh)/.6;t=Math.min(1,Math.max(0,t));
+ f.style.setProperty('--t',t.toFixed(4));
+ const tag=i===0?(t<.6?'Excavamos':'La ciudad de hoy'):(t<.45?'Se hunde: '+names[i-1].toLowerCase():'Se levanta: '+names[i].toLowerCase());
+ const el=f.querySelector('.tag');if(el.textContent!==tag)el.textContent=tag})}
 addEventListener('scroll',fade,{passive:true});addEventListener('resize',fade);
 measure();update();
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in')}),{threshold:.25});
@@ -640,6 +642,80 @@ function loop(){
  requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
+/* ===== Evolución 3D: la época de arriba se hunde en polvo y la de abajo se levanta ===== */
+{
+const ec=document.createElement('canvas');ec.id='evo';ec.setAttribute('aria-hidden','true');document.body.appendChild(ec);
+let er=null;try{er=new THREE.WebGLRenderer({canvas:ec,antialias:true,alpha:true,powerPreference:'low-power'})}catch(e){ec.remove()}
+if(er){
+ root.classList.add('evo');
+ const dpr=Math.min(devicePixelRatio,1.5);er.setPixelRatio(dpr);er.outputColorSpace=THREE.SRGBColorSpace;er.setClearColor(0x000000,0);er.autoClear=false;
+ const es=new THREE.Scene(),ecam=new THREE.PerspectiveCamera(30,5/3,.1,30);ecam.position.set(0,0,3.75);ecam.lookAt(0,0,0);
+ const tl=new THREE.TextureLoader(),etex={};
+ const getT=i=>{if(i<0||i>12)return null;if(!etex[i]){const t=tl.load('img/capa-'+i+'-a.jpg',()=>{t.userData.ok=true});t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;t.userData.ok=false;etex[i]=t}return etex[i].userData.ok?etex[i]:null};
+ const PW=3.2,PH=PW*3/5;
+ const DEPTH=`float depthAt(vec2 uv,vec3 c){float l=dot(c,vec3(.3,.59,.11));return ((1.0-uv.y)*-.6+l*.16)*uRelief;}`;
+ const planeMat=()=>new THREE.ShaderMaterial({transparent:true,depthWrite:false,uniforms:{uTex:{value:null},uA:{value:1},uRelief:{value:1}},
+  vertexShader:`uniform sampler2D uTex;uniform float uRelief;varying vec2 vUv;${DEPTH}
+   void main(){vUv=uv;vec3 p=position;p.z+=depthAt(uv,texture2D(uTex,uv).rgb);gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);}`,
+  fragmentShader:`uniform sampler2D uTex;uniform float uA;varying vec2 vUv;
+   void main(){vec4 c=texture2D(uTex,vUv);float v=smoothstep(0.,.04,vUv.x)*smoothstep(1.,.96,vUv.x)*smoothstep(0.,.05,vUv.y)*smoothstep(1.,.95,vUv.y);gl_FragColor=vec4(c.rgb,uA*v);
+   #include <colorspace_fragment>
+   }`});
+ const pgeo=new THREE.PlaneGeometry(PW,PH,150,90);
+ const planeOut=new THREE.Mesh(pgeo,planeMat()),planeIn=new THREE.Mesh(pgeo,planeMat());
+ const GX=210,GY=126,N=GX*GY,pos=new Float32Array(N*3),uv=new Float32Array(N*2),rd=new Float32Array(N*3);
+ for(let y=0;y<GY;y++)for(let x=0;x<GX;x++){const k=y*GX+x,u=(x+.5)/GX,v=(y+.5)/GY;pos[k*3]=(u-.5)*PW;pos[k*3+1]=(v-.5)*PH;uv[k*2]=u;uv[k*2+1]=v;rd[k*3]=Math.random();rd[k*3+1]=Math.random();rd[k*3+2]=Math.random()}
+ const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.BufferAttribute(pos,3));pg.setAttribute('aUv',new THREE.BufferAttribute(uv,2));pg.setAttribute('aR',new THREE.BufferAttribute(rd,3));
+ const pMat=mode=>new THREE.ShaderMaterial({transparent:true,depthWrite:false,uniforms:{uTex:{value:null},uT:{value:0},uSize:{value:4},uRelief:{value:1},uMode:{value:mode},uTime:{value:0}},
+  vertexShader:`uniform sampler2D uTex;uniform float uT,uSize,uRelief,uMode,uTime;attribute vec2 aUv;attribute vec3 aR;varying vec3 vC;varying float vA;${DEPTH}
+   void main(){vec3 c=texture2D(uTex,aUv).rgb;vec3 p=position;p.z+=depthAt(aUv,c);
+    vec3 dust=vec3(.30,.22,.14);float lt,a,grow=0.;
+    if(uMode<.5){ /* se hunde: cae desde lo alto, se vuelve tierra */
+      float d=(1.0-aUv.y)*.32+aR.x*.33;lt=clamp((uT-d)/.35,0.,1.);float e=lt*lt;
+      p.y-=e*(.7+aR.y*1.3);p.x+=(aR.z-.5)*e*.8+sin(uTime*2.+aR.y*30.)*.02*e;p.z+=(aR.x-.5)*e*1.1+e*.25;
+      a=1.0-smoothstep(.55,1.,lt);c=mix(c,dust,smoothstep(.05,.6,lt));grow=e*.8;
+    }else{ /* se levanta: desde abajo, hilada a hilada */
+      float d=aUv.y*.42+aR.x*.23;lt=clamp((uT-d)/.35,0.,1.);float e=1.0-pow(1.0-lt,3.);
+      vec3 s=vec3((aR.z-.5)*.45,-.75-aR.y*.9,(aR.x-.5)*.7);p+=s*(1.0-e);
+      a=smoothstep(0.,.3,lt);c=mix(dust*1.3,c,smoothstep(.25,.95,lt));grow=(1.0-e)*.7;
+    }
+    vC=c;vA=a;gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);gl_PointSize=a>.002?uSize*(1.0+grow):0.;}`,
+  fragmentShader:`varying vec3 vC;varying float vA;void main(){vec2 q=gl_PointCoord-.5;float r=dot(q,q);if(r>.25)discard;gl_FragColor=vec4(vC,vA*smoothstep(.25,.12,r));
+   #include <colorspace_fragment>
+   }`});
+ const ptOut=new THREE.Points(pg,pMat(0)),ptIn=new THREE.Points(pg,pMat(1));ptOut.frustumCulled=ptIn.frustumCulled=false;
+ const grp=new THREE.Group();grp.add(planeOut,planeIn,ptOut,ptIn);grp.scale.setScalar(1.12);es.add(grp);
+ planeOut.renderOrder=0;ptOut.renderOrder=1;ptIn.renderOrder=2;planeIn.renderOrder=3;
+ const cl=x=>Math.min(1,Math.max(0,x)),sm=(a,b,x)=>{const t=cl((x-a)/(b-a));return t*t*(3-2*t)};
+ let emx=0,emy=0;addEventListener('pointermove',e=>{emx=e.clientX/innerWidth-.5;emy=e.clientY/innerHeight-.5},{passive:true});
+ const eclock=new THREE.Clock();let lw=0,lh=0;
+ function eloop(){
+  requestAnimationFrame(eloop);if(document.hidden)return;
+  const w=innerWidth,h=innerHeight;if(w!==lw||h!==lh){er.setSize(w,h,false);lw=w;lh=h}
+  er.setScissorTest(false);er.clear();er.setScissorTest(true);
+  const figs=window.reconFigs||[],t=eclock.getElapsedTime();
+  figs.forEach((f,i)=>{
+   if(!f.classList.contains('photo'))return;const img=f.querySelector('img.pa');if(!img)return;
+   const r=img.getBoundingClientRect();if(r.bottom<0||r.top>h||r.width<10)return;
+   const tin=getT(i),tout=i>0?getT(i-1):null;if(!tin){getT(i-1);return}
+   const P=+(f.style.getPropertyValue('--t')||0);
+   let po,pi;if(i===0||!tout){po=1;pi=cl(P/.55)}else{po=cl((P-.05)/.42);pi=cl((P-.24)/.46)}
+   if(reduce){po=P<.5?0:1;pi=P<.5?0:1}
+   planeOut.visible=!!tout&&po<.06;planeOut.material.uniforms.uTex.value=tout;planeOut.material.uniforms.uA.value=1-sm(0,.06,po);
+   ptOut.visible=!!tout&&po>0&&po<1;ptOut.material.uniforms.uTex.value=tout;ptOut.material.uniforms.uT.value=po;
+   ptIn.visible=pi>0&&pi<1;ptIn.material.uniforms.uTex.value=tin;ptIn.material.uniforms.uT.value=pi;
+   planeIn.visible=pi>.8;planeIn.material.uniforms.uTex.value=tin;planeIn.material.uniforms.uA.value=sm(.8,1,pi);
+   const size=r.width*dpr/GX*1.45;ptOut.material.uniforms.uSize.value=ptIn.material.uniforms.uSize.value=size;
+   ptOut.material.uniforms.uTime.value=t;
+   grp.rotation.x=-.2+(reduce?0:emy*.06+Math.sin(t*.3)*.01);grp.rotation.y=reduce?0:emx*.1+Math.sin(t*.2)*.015;
+   ecam.aspect=r.width/r.height;ecam.updateProjectionMatrix();
+   const y=h-r.bottom;er.setViewport(r.left,y,r.width,r.height);er.setScissor(r.left,y,r.width,r.height);
+   er.render(es,ecam);
+  });
+ }
+ requestAnimationFrame(eloop);
+}
+}
 /* ===== Reconstrucciones: cómo era en su época ===== */
 const figs=window.reconFigs||[];const caps=window.reconCaps||[];
 
