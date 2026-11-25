@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="es" data-variant="pastoral" class="no-3d">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Excavar Jerusalén</title>
+<meta name="description" content="Una columna de tierra, cuatro mil años: baja con el scroll a través de las capas de Jerusalén, de la ciudad de hoy al manantial de Guijón.">
+<meta property="og:title" content="Excavar Jerusalén · Cuatro mil años en una columna de tierra">
+<meta property="og:description" content="Baja con el scroll: cruzados, bizantinos, Herodes, David… hasta el agua que hizo nacer la ciudad.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0B0A08">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230B0A08'/%3E%3Crect x='6' y='6' width='20' height='5' fill='%23C9A35B'/%3E%3Crect x='6' y='13' width='20' height='5' fill='%238a7356'/%3E%3Crect x='6' y='20' width='20' height='6' fill='%234f4134'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+/*
+VOICE: silencio de excavación nocturna; lento, reverente, preciso.
+IDEA: un corte estratigráfico de museo: la cámara baja por la pared de una zanja.
+PICTURE: columna de tierra 3D con la ciudad encima, hallazgos flotando y una lámpara que alumbra.
+COLOUR and TYPE: noche #0B0A08, tierras de cada época, oro viejo #C9A35B; Cormorant + Source Serif 4.
+LAYOUT: regla de profundidad a la izquierda, texto en columna, la tierra a la derecha; móvil apilado.
+*/
+:root{
+ --font-display:"Cormorant Garamond","EB Garamond",Georgia,serif;
+ --font-body:"Source Serif 4","Literata",Georgia,serif;
+ --step-hero:clamp(3.4rem,9vw,9.5rem); --step-h2:clamp(2.2rem,4.6vw,4.2rem);
+ --step-body:clamp(1rem,1.05vw,1.15rem); --step-small:.82rem;
+ --bg:#0B0A08; --fg:#F2EBDD; --muted:#B3AA97; --accent:#C9A35B; --accent-2:#7A1F1F;
+ --line:color-mix(in srgb,var(--fg) 14%,transparent);
+ --space-1:.5rem;--space-2:1rem;--space-3:1.5rem;--space-4:2.5rem;--space-5:4rem;--space-6:6.5rem;
+ --gutter:clamp(1rem,4vw,4rem); --gauge:clamp(4.5rem,8vw,7.5rem);
+ --ease-out:cubic-bezier(.22,1,.36,1); --dur-ui:380ms; --dur-reveal:1100ms;
+}
+*{box-sizing:border-box;min-width:0}
+html{scroll-behavior:smooth;background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 var(--step-body)/1.6 var(--font-body);overflow-x:clip;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.skip{position:fixed;left:1rem;top:-4rem;z-index:50;background:var(--accent);color:var(--bg);padding:.7rem 1rem;text-decoration:none}
+.skip:focus{top:1rem}
+
+/* escena */
+#scene{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:0}
+.no-3d #scene{display:none}
+.fallback{position:fixed;top:0;bottom:0;right:8vw;width:min(34vw,420px);overflow:hidden;z-index:0;display:none;
+ border-left:1px solid var(--line);border-right:1px solid var(--line)}
+.no-3d .fallback{display:block}
+.fallback .strip{will-change:transform}
+.fallback .band{height:46vh;border-top:1px solid rgba(0,0,0,.35);
+ background-image:radial-gradient(circle at 20% 30%,rgba(255,255,255,.06) 0 2px,transparent 3px),radial-gradient(circle at 70% 60%,rgba(0,0,0,.18) 0 3px,transparent 4px);
+ background-size:38px 31px,53px 47px}
+.veil{position:fixed;inset:0;z-index:1;pointer-events:none;
+ background:linear-gradient(90deg,var(--bg) 0,color-mix(in srgb,var(--bg) 88%,transparent) calc(var(--gauge) + 30vw),transparent 62%),
+ linear-gradient(0deg,color-mix(in srgb,var(--bg) 70%,transparent),transparent 22%)}
+
+/* cabecera */
+.top{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;justify-content:space-between;align-items:center;
+ padding:1rem var(--gutter);pointer-events:none}
+.top>*{pointer-events:auto}
+.brand{font:600 1.25rem/1 var(--font-display);letter-spacing:.01em;text-decoration:none}
+.brand span{color:var(--accent)}
+.menu-btn{display:none;min-height:44px;padding:0 1rem;background:color-mix(in srgb,var(--bg) 80%,transparent);color:var(--fg);
+ border:1px solid var(--line);font:500 1rem var(--font-body);cursor:pointer}
+
+/* regla de profundidad */
+.gauge{position:fixed;left:0;top:0;bottom:0;width:var(--gauge);z-index:15;display:flex;align-items:center}
+.gauge ol{list-style:none;margin:0;padding:0 0 0 var(--gutter);position:relative}
+.gauge ol::before{content:"";position:absolute;left:calc(var(--gutter) + 3px);top:.6rem;bottom:.6rem;width:1px;background:var(--line)}
+.gauge a{display:flex;align-items:center;gap:.7rem;min-height:30px;text-decoration:none;color:var(--muted);font-size:var(--step-small);white-space:nowrap;position:relative}
+.gauge a i{width:7px;height:7px;border:1px solid var(--muted);background:var(--bg);transform:rotate(45deg);flex:none;transition:all var(--dur-ui) var(--ease-out)}
+.gauge a span{opacity:0;transform:translateX(-4px);transition:all var(--dur-ui) var(--ease-out)}
+.gauge a:hover span,.gauge a:focus-visible span{opacity:1;transform:none;background:var(--bg);padding:.2rem .4rem}
+.gauge a[aria-current]{color:var(--accent)}
+.gauge a[aria-current] i{background:var(--accent);border-color:var(--accent)}
+
+/* contador */
+.hud{position:fixed;right:var(--gutter);bottom:clamp(1rem,3vh,2rem);z-index:15;text-align:right;pointer-events:none}
+.hud .lbl{font-size:var(--step-small);color:var(--muted);margin:0}
+.hud .year{font:500 clamp(2.4rem,5vw,4.4rem)/1 var(--font-display);color:var(--accent);margin:.1rem 0 .3rem;font-variant-numeric:tabular-nums}
+.hud .depth{font-size:var(--step-small);color:var(--fg);margin:0;font-variant-numeric:tabular-nums}
+
+/* contenido */
+main{position:relative;z-index:5}
+.hero{min-height:100svh;display:grid;align-content:center;padding:6rem var(--gutter) 5rem calc(var(--gauge) + var(--gutter))}
+.hero h1{font:500 var(--step-hero)/.9 var(--font-display);letter-spacing:-.02em;margin:0 0 var(--space-3);max-width:9ch}
+.hero h1 em{font-style:italic;color:var(--accent)}
+.hero .lead{max-width:34ch;font-size:clamp(1.1rem,1.5vw,1.4rem);margin:0 0 var(--space-3)}
+.hero .note{max-width:52ch;color:var(--muted);font-size:var(--step-small);margin:0 0 var(--space-4)}
+.dig{display:inline-flex;align-items:center;gap:.8rem;min-height:48px;padding:0 1.4rem;border:1px solid var(--accent);color:var(--accent);text-decoration:none;width:max-content}
+.dig svg{animation:bob 2.4s var(--ease-out) infinite}
+@keyframes bob{50%{transform:translateY(4px)}}
+
+.layer{min-height:120svh;display:grid;align-content:center;padding:6rem var(--gutter) 6rem calc(var(--gauge) + var(--gutter))}
+.card{max-width:36rem}
+.era{display:flex;align-items:baseline;gap:.9rem;color:var(--muted);font-size:var(--step-small);margin:0 0 var(--space-2);letter-spacing:.02em}
+.num{font:600 2.2rem/1 var(--font-display);color:var(--accent);min-width:2ch}
+.layer h2,.end h2{font:500 var(--step-h2)/1 var(--font-display);letter-spacing:-.015em;margin:0 0 var(--space-3);text-wrap:balance}
+.mask{display:block;overflow:hidden;padding-bottom:.08em}
+.mask>span{display:block;transform:translateY(105%);transition:transform var(--dur-reveal) var(--ease-out)}
+.in .mask>span{transform:none}
+.card p{margin:0 0 var(--space-2);max-width:62ch}
+.card>p:not(.era):not(.find):not(.ask),.card blockquote,.find,.ask{opacity:0;transform:translateY(18px);transition:opacity var(--dur-reveal) var(--ease-out),transform var(--dur-reveal) var(--ease-out)}
+.in .card>*{opacity:1!important;transform:none!important}
+.find{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:.8rem 0;margin:var(--space-3) 0!important;font-size:.95em}
+.find b{display:block;font-weight:600;color:var(--accent);font-size:var(--step-small);margin-bottom:.15rem}
+blockquote{margin:var(--space-3) 0;padding:0 0 0 1.2rem;border-left:1px solid var(--accent)}
+blockquote p{font:italic 500 clamp(1.35rem,2vw,1.75rem)/1.3 var(--font-display);margin:0 0 .4rem!important}
+cite{font-style:normal;font-variant:small-caps;letter-spacing:.06em;color:var(--muted);font-size:.9rem}
+.ask{font-style:italic;color:var(--fg)}
+.ask::before{content:"Para orar · ";font-style:normal;color:var(--accent);font-size:var(--step-small)}
+
+.end{min-height:110svh;display:grid;align-content:center;padding:6rem var(--gutter) 8rem calc(var(--gauge) + var(--gutter))}
+.end .card{max-width:40rem}
+.end .rise{font:italic 500 clamp(1.6rem,3vw,2.6rem)/1.2 var(--font-display);color:var(--accent);margin:var(--space-4) 0 var(--space-3)}
+.up{display:inline-flex;align-items:center;gap:.7rem;min-height:48px;padding:0 1.4rem;background:var(--accent);color:var(--bg);text-decoration:none;font-weight:600}
+footer{position:relative;z-index:5;padding:var(--space-4) var(--gutter) var(--space-5) calc(var(--gauge) + var(--gutter));border-top:1px solid var(--line);color:var(--muted);font-size:var(--step-small);background:var(--bg)}
+footer p{max-width:70ch;margin:0 0 .6rem}
+
+.loader{position:fixed;inset:0;z-index:40;display:grid;place-items:center;background:var(--bg);transition:opacity .6s var(--ease-out)}
+.loader p{font:italic 500 1.3rem var(--font-display);color:var(--muted)}
+.ready .loader,.no-3d .loader{opacity:0;pointer-events:none}
+
+@media (max-width:820px){
+ :root{--gauge:0px}
+ .menu-btn{display:block}
+ .gauge{display:none;inset:0;width:auto;background:color-mix(in srgb,var(--bg) 96%,transparent);justify-content:center;z-index:30}
+ .gauge.open{display:flex}
+ .gauge ol{padding:0}
+ .gauge ol::before{left:3px}
+ .gauge a{min-height:44px;font-size:1rem}
+ .gauge a span{opacity:1;transform:none}
+ .veil{background:linear-gradient(0deg,color-mix(in srgb,var(--bg) 92%,transparent) 0,color-mix(in srgb,var(--bg) 55%,transparent) 55%,color-mix(in srgb,var(--bg) 20%,transparent))}
+ .fallback{right:0;left:0;width:auto;opacity:.45}
+ .layer{min-height:175svh;align-content:end;padding-bottom:4rem}
+ .hud{top:4.4rem;bottom:auto;display:flex;align-items:baseline;gap:.6rem}
+ .hud .lbl{display:none}
+ .hud .year{font-size:1.7rem;margin:0}
+ .card{background:color-mix(in srgb,var(--bg) 72%,transparent);padding:1.2rem;margin-inline:-1.2rem;border-top:1px solid var(--line)}
+ .hud{left:var(--gutter);right:auto;text-align:left;background:color-mix(in srgb,var(--bg) 70%,transparent);padding:.2rem .6rem;margin-left:-.6rem}
+ .hero{align-content:end;padding-bottom:7rem}
+}
+@media (prefers-reduced-motion:reduce){
+ html{scroll-behavior:auto}
+ *,*::before,*::after{transition-duration:150ms!important;animation:none!important}
+ .mask>span{transform:none}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#capa-0">Saltar al contenido</a>
+<div class="loader" aria-hidden="true"><p>Encendiendo la lámpara…</p></div>
+<canvas id="scene" aria-hidden="true"></canvas>
+<div class="fallback" aria-hidden="true"><div class="strip" id="strip"></div></div>
+<div class="veil" aria-hidden="true"></div>
+
+<header class="top">
+ <a class="brand" href="#inicio">Excavar <span>Jerusalén</span></a>
+ <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="gauge">Capas</button>
+</header>
+
+<nav class="gauge" id="gauge" aria-label="Capas de la excavación"><ol id="gaugeList"></ol></nav>
+
+<div class="hud" aria-live="off">
+ <p class="lbl">Año</p>
+ <p class="year" id="year">2026</p>
+ <p class="depth" id="depth">Superficie</p>
+</div>
+
+<main>
+<section class="hero" id="inicio" data-year="2026" data-depth="-2" data-label="Inicio">
+ <h1>Excavar <em>Jerusalén</em></h1>
+ <p class="lead">Bajo los pies del peregrino hay cuatro mil años de ciudad. Baja despacio: cada palmo de tierra es un siglo.</p>
+ <p class="note">Una columna ideal: reúne en un solo corte estratos hallados en distintos puntos de la ciudad (la Ciudad de David, el Santo Sepulcro, el Barrio Judío). Las profundidades son orientativas.</p>
+ <a class="dig" href="#capa-0">Empieza a cavar
+  <svg width="14" height="18" viewBox="0 0 14 18" aria-hidden="true"><path d="M7 1v15M1 10l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></a>
+</section>
+
+<section class="layer" id="capa-0" data-year="2026" data-depth="0" data-label="Hoy" data-color="#cdbb98" data-style="paving">
+ <div class="card">
+  <p class="era"><span class="num">·</span> Superficie · hoy</p>
+  <h2><span class="mask"><span>La ciudad viva</span></span></h2>
+  <p>Piedra caliza blanca y dorada, campanas del Santo Sepulcro, la llamada a la oración, el murmullo del Muro Occidental. Por estas losas pasan cada año peregrinos de todo el mundo.</p>
+  <p>Desde 1342 los franciscanos custodian aquí los Santos Lugares en nombre de la Iglesia. Lo que pisamos hoy es solo la última página de un libro muy grueso.</p>
+  <p class="find"><b>Hallazgo</b>Un sillar de piedra de Jerusalén, la caliza que da a la ciudad su color de oro al atardecer.</p>
+  <blockquote><p>«Ya están pisando nuestros pies tus umbrales, Jerusalén.»</p><cite>Sal 122,2</cite></blockquote>
+  <p class="ask">¿Sobre qué cimientos camina hoy mi vida?</p>
+ </div>
+</section>
+
+<section class="layer" id="capa-1" data-year="1537" data-depth="1" data-label="Otomanos" data-color="#b9a27c" data-style="ashlar">
+ <div class="card">
+  <p class="era"><span class="num">I</span> Época otomana · 1517–1917</p>
+  <h2><span class="mask"><span>Las murallas de Solimán</span></span></h2>
+  <p>Entre 1537 y 1541 el sultán Solimán el Magnífico levanta las murallas que hoy rodean la Ciudad Vieja, con sus puertas de Jafa, de Damasco y de los Leones.</p>
+  <p>En esos siglos los frailes de la Custodia resisten expulsiones, impuestos y pestes para no dejar solos los Santos Lugares. En 1921 empiezan a contarlo en español en la revista «Tierra Santa».</p>
+  <p class="find"><b>Hallazgo</b>Un azulejo vidriado otomano, como los que revisten los grandes edificios de la época.</p>
+  <blockquote><p>«Sobre tus murallas, Jerusalén, he colocado centinelas.»</p><cite>Is 62,6</cite></blockquote>
+  <p class="ask">¿Qué custodio yo con fidelidad, aunque nadie me lo agradezca?</p>
+ </div>
+</section>
+
+<section class="layer" id="capa-2" data-year="1149" data-depth="3" data-label="Cruzados" data-color="#9c8462" data-style="rubble">
+ <div class="card">
+  <p class="era"><span class="num">II</span> Reino cruzado · 1099–1187</p>
+  <h2><span class="mask"><span>Los cruzados</span></span></h2>
+  <p>El 15 de julio de 1099 los cruzados entran en la ciudad. Cincuenta años después, en 1149, consagran el Santo Sepulcro reconstruido: por primera vez el Calvario y la tumba quedan bajo un mismo techo, como hoy.</p>
+  <p>En los muros de la capilla de Santa Elena, los peregrinos medievales dejaron cientos de pequeñas cruces grabadas a cuchillo: su firma de que habían llegado.</p>
+  <p class="find"><b>Hallazgo</b>Una cruz de Jerusalén, la cruz grande con cuatro pequeñas que todavía lleva la Custodia.</p>
+  <blockquote><p>«¿Por qué buscáis entre los muertos al que vive?»</p><cite>Lc 24,5</cite></blockquote>
+  <p class="ask">¿Busco a Cristo entre recuerdos muertos o entre los vivos?</p>
+ </div>
+</section>
+
+<section class="layer" id="capa-3" data-year="691" data-depth="5" data-label="Islam temprano" data-color="#8a7356" data-style="fill">
+ <div class="card">
+  <p class="era"><span class="num">III</span> Primeros siglos islámicos · 638–1099</p>
+  <h2><span class="mask"><span>Bajo la media luna</span></span></h2>
+  <p>En el 638 el patriarca Sofronio entrega la ciudad al califa Omar. En el 691 se termina la Cúpula de la Roca sobre la explanada del antiguo Templo.</p>
+  <p>Los cristianos siguen rezando en sus iglesias durante siglos, hasta que en 1009 el califa al-Hákim manda demoler el Santo Sepulcro casi hasta la roca.</p>
+  <p class="find"><b>Hallazgo</b>Una lámpara de aceite de barro, la luz humilde de las casas de entonces.</p>
+  <blockquote><p>«Se dirá de Sión: “Uno por uno todos han nacido en ella”.»</p><cite>Sal 87,5</cite></blockquote>
+  <p class="ask">¿Sé vivir mi fe junto a quien cree de otra manera?</p>
+ </div>
+</section>
+
+<section class="layer" id="capa-4" data-year="335" data-depth="7" data-label="Bizantinos" data-color="#7d6a52" data-style="mosaic">
+ <div class="card">
+  <p class="era"><span class="num">IV</span> Jerusalén bizantina · 324–638</p>
+  <h2><span class="mask"><span>La ciudad de las basílicas</span></span></h2>
+  <p>Constantino manda buscar la tumba de Cristo. Bajo un templo pagano aparece la roca del sepulcro, y en el 335 se dedica la gran basílica de la Resurrección. La peregrina Egeria describe hacia el 383 su liturgia, día a día.</p>
+  <p>Mosaicos, monasterios, hospederías para peregrinos. En el 614 los persas lo incendian todo; la ciudad vuelve a levantarse.</p>
+  <p class="find"><b>Hallazgo</b>Teselas de un suelo de mosaico, pequeñas piedras de colores que componían cruces, viñas y peces.</p>
+  <blockquote><p>«En el sitio donde lo crucificaron había un huerto, y en el huerto, un sepulcro nuevo.»</p><cite>Jn 19,41</cite></blockquote>
+  <p class="ask">¿Dónde está el huerto escondido en mi propia historia?</p>
+ </div>
+</section>
+
+<section class="layer" id="capa-5" data-year="135" data-depth="9" data-label="Romanos" data-color="#6e5a44" data-style="fill">
+ <div class="card">
+  <p class="era"><span class="num">V</span> Destrucción y Aelia Capitolina · 70–324</p>
+  <h2><span class="mask"><span>Aelia Capitolina</span></span></h2>
+  <p>En el año 70 las legiones de Tito queman el Templo. En el Barrio Judío se conserva una casa sorprendida por el incendio, con sus vasijas y la ceniza todavía en el suelo.</p>
+  <p>Hacia el 135 el emperador Adriano refunda la ciudad con nombre romano y levanta un templo sobre el Calvario. Quería borrar el lugar; sin saberlo, lo dejó señalado para siempre.</p>
+  <p class="find"><b>Hallazgo</b>Una moneda de bronce acuñada en Aelia Capitolina.</p>
+  <blockquote><p>«No dejarán piedra sobre piedra.»</p><cite>Lc 19,44</cite></blockquote>
+  <p class="ask">¿Qué ha querido enterrar el mundo en mí que Dios sigue guardando?</p>
+ </div>
+</section>
+
+<section class="layer" id="capa-6" data-year="30" data-depth="12" data-label="Tiempo de Jesús" data-color="#8e7a5c" data-style="ashlar">
+ <div class="card">
+  <p class="era"><span class="num">VI</span> Época herodiana · 37 a. C.–70 d. C.</p>
+  <h2><span class="mask"><span>En tiempos de Jesús</span></span></h2>
+  <p>Herodes el Grande agranda el Templo con bloques enormes. Una calle escalonada sube desde la piscina de Siloé, descubierta en 2004, hasta la explanada: por ella subían los peregrinos en las fiestas.</p>
+  <p>El Gólgota era entonces una antigua cantera fuera de la muralla, con tumbas excavadas en la roca. Aquí, a esta profundidad, camina Jesús.</p>
+  <p class="find"><b>Hallazgo</b>Un peldaño gastado de la calle de los peregrinos.</p>
+  <blockquote><p>«Ve a lavarte a la piscina de Siloé.»</p><cite>Jn 9,7</cite></blockquote>
+  <p class="ask">¿Qué paso me pide hoy Jesús para poder ver?</p>
+ </div>
+</section>
+
+<section class="layer" id="capa-7" data-year="-586" data-depth="14" data-label="Babilonia" data-color="#3a2c22" data-style="ash">
+ <div class="card">
+  <p class="era"><span class="num">VII</span> Conquista babilónica · 586 a. C.</p>
+  <h2><span class="mask"><span>Ceniza de Babilonia</span></span></h2>
+  <p>Nabucodonosor arrasa la ciudad y el primer Templo. En la Ciudad de David aparece una capa negra de ceniza, puntas de flecha y casas derrumbadas.</p>
+  <p>El incendio coció unas pequeñas bulas de barro, los sellos de los documentos. Una lleva el nombre de Guemarías, hijo de Safán, el mismo que nombra el profeta Jeremías. El fuego que destruyó la ciudad conservó los nombres.</p>
+  <p class="find"><b>Hallazgo</b>Una bula de barro endurecida por el fuego.</p>
+  <blockquote><p>«¡Qué solitaria se encuentra la ciudad populosa!»</p><cite>Lam 1,1</cite></blockquote>
+  <p class="ask">¿Qué nombres ha guardado Dios de mis propios incendios?</p>
+ </div>
+</section>
+
+<section class="layer" id="capa-8" data-year="-701" data-depth="16" data-label="Ezequías" data-color="#6a5a47" data-style="bedrock">
+ <div class="card">
+  <p class="era"><span class="num">VIII</span> Reino de Judá · hacia 701 a. C.</p>
+  <h2><span class="mask"><span>El túnel de Ezequías</span></span></h2>
+  <p>Ante la amenaza asiria de Senaquerib, el rey Ezequías manda excavar en la roca un túnel en forma de S, de más de 500 metros, para llevar el agua del manantial dentro de las murallas.</p>
+  <p>Dos cuadrillas cavaron desde los dos extremos hasta encontrarse. Una inscripción en hebreo antiguo cuenta el momento en que oyeron, a través de la roca, los golpes de los otros.</p>
+  <p class="find"><b>Hallazgo</b>El trazado del túnel, que todavía hoy se recorre con el agua por las rodillas.</p>
+  <blockquote><p>«Hizo la alberca y el canal y llevó el agua a la ciudad.»</p><cite>2 Re 20,20</cite></blockquote>
+  <p class="ask">¿Por dónde llega el agua viva a mi ciudad sitiada?</p>
+ </div>
+</section>
+
+<section class="layer" id="capa-9" data-year="-1000" data-depth="19" data-label="David" data-color="#5c4b3a" data-style="rubble">
+ <div class="card">
+  <p class="era"><span class="num">IX</span> Monarquía unida · hacia 1000 a. C.</p>
+  <h2><span class="mask"><span>La fortaleza de Sión</span></span></h2>
+  <p>David conquista la fortaleza jebusea y la hace su capital. En la ladera de la Ciudad de David se alza una gran estructura de piedra escalonada que sostenía edificios en lo alto.</p>
+  <p>Los arqueólogos discuten aún su fecha exacta y si perteneció al palacio de David. La arqueología de Jerusalén no está cerrada: cada campaña añade y corrige.</p>
+  <p class="find"><b>Hallazgo</b>Los muros en terraza de la estructura escalonada.</p>
+  <blockquote><p>«David conquistó la fortaleza de Sión, que es la Ciudad de David.»</p><cite>2 Sam 5,7</cite></blockquote>
+  <p class="ask">¿Qué fortaleza mía tiene todavía que rendirse al Señor?</p>
+ </div>
+</section>
+
+<section class="layer" id="capa-10" data-year="-1800" data-depth="22" data-label="Salén" data-color="#4f4134" data-style="ashlar">
+ <div class="card">
+  <p class="era"><span class="num">X</span> Bronce Medio · hacia 1800 a. C.</p>
+  <h2><span class="mask"><span>Salén de los cananeos</span></span></h2>
+  <p>Unos textos egipcios de maldición, escritos en vasijas que se rompían en un rito, nombran ya a «Rushalimum» entre los enemigos de Egipto.</p>
+  <p>Junto al manantial aparecen murallas de grandes piedras de esta época. Es la ciudad de Abrahán y de Melquisedec, el rey sacerdote que salió a su encuentro.</p>
+  <p class="find"><b>Hallazgo</b>Un sillar ciclópeo de la muralla cananea.</p>
+  <blockquote><p>«Melquisedec, rey de Salén, sacó pan y vino.»</p><cite>Gn 14,18</cite></blockquote>
+  <p class="ask">¿Reconozco el pan y el vino que Dios me ofrece antes de saber su nombre?</p>
+ </div>
+</section>
+
+<section class="layer" id="capa-11" data-year="-2000" data-depth="25" data-label="El manantial" data-color="#3b322a" data-style="bedrock">
+ <div class="card">
+  <p class="era"><span class="num">·</span> Roca madre</p>
+  <h2><span class="mask"><span>El manantial de Guijón</span></span></h2>
+  <p>Al fondo de todo no hay un palacio ni un templo: hay agua. Jerusalén nació aquí porque en esta ladera brotaba un manantial. Todas las capas que has atravesado se apoyan en él.</p>
+  <blockquote><p>«El correr de las acequias alegra la ciudad de Dios.»</p><cite>Sal 46,5</cite></blockquote>
+  <p class="ask">¿Cuál es el manantial escondido que sostiene todo lo que construyo?</p>
+ </div>
+</section>
+
+<section class="end" id="fin" data-year="-2000" data-depth="25" data-label="La ciudad que baja">
+ <div class="card">
+  <h2><span class="mask"><span>La ciudad que baja</span></span></h2>
+  <p>Hemos cavado cuatro mil años hacia abajo, buscando el origen. La Escritura termina con el movimiento contrario: una ciudad que no se excava, sino que se recibe.</p>
+  <blockquote><p>«Y vi la ciudad santa, la nueva Jerusalén, que descendía del cielo.»</p><cite>Ap 21,2</cite></blockquote>
+  <p class="rise">Nosotros cavamos hacia abajo. Ella baja hacia nosotros.</p>
+  <a class="up" href="#inicio">Volver a la superficie
+   <svg width="14" height="18" viewBox="0 0 14 18" aria-hidden="true"><path d="M7 17V2M1 8l6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></a>
+ </div>
+</section>
+</main>
+
+<footer>
+ <p>Columna ideal con fines catequéticos: las capas proceden de excavaciones en distintos puntos de Jerusalén y las profundidades son orientativas. Algunas fechas, como las de la estructura escalonada, siguen en discusión entre los arqueólogos.</p>
+ <p>Citas bíblicas: Sagrada Biblia, versión oficial de la Conferencia Episcopal Española.</p>
+</footer>
+
+<script>
+{
+const root=document.documentElement;
+const secs=[...document.querySelectorAll('main>section')];
+const layers=secs.filter(s=>s.dataset.color);
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const yearEl=document.getElementById('year'),depthEl=document.getElementById('depth');
+const list=document.getElementById('gaugeList'),gauge=document.getElementById('gauge'),btn=document.getElementById('menuBtn');
+const roman=['·','I','II','III','IV','V','VI','VII','VIII','IX','X','·'];
+const fmtYear=y=>{y=Math.round(y);return y>0?(y<1000?y+' d. C.':String(y)):(-y)+' a. C.'};
+list.innerHTML=layers.map((s,i)=>`<li><a href="#${s.id}" data-i="${i}"><i></i><span>${fmtYear(+s.dataset.year)} · ${s.dataset.label}</span></a></li>`).join('');
+const links=[...list.querySelectorAll('a')];
+btn.addEventListener('click',()=>{const o=gauge.classList.toggle('open');btn.setAttribute('aria-expanded',o)});
+links.forEach(a=>a.addEventListener('click',()=>{gauge.classList.remove('open');btn.setAttribute('aria-expanded','false')}));
+addEventListener('keydown',e=>{if(e.key==='Escape'&&gauge.classList.contains('open')){gauge.classList.remove('open');btn.setAttribute('aria-expanded','false');btn.focus()}});
+
+/* respaldo sin WebGL: bandas de tierra */
+const strip=document.getElementById('strip');
+strip.innerHTML=layers.map(s=>`<div class="band" style="background-color:${s.dataset.color}"></div>`).join('');
+
+/* anclas: posición de scroll → índice continuo de capa */
+let anchors=[];
+function measure(){
+ const vh=innerHeight;
+ anchors=secs.map(s=>{
+  const idx=s.dataset.color?layers.indexOf(s):(s.id==='inicio'?-1.25:layers.length-1+.35);
+  return {at:s.offsetTop+s.offsetHeight/2-vh/2,idx,year:+s.dataset.year,depth:+s.dataset.depth};
+ });
+}
+function sample(){
+ const y=scrollY;let a=anchors[0],b=anchors[anchors.length-1];
+ if(y<=a.at) return {...a};
+ if(y>=b.at) return {...b};
+ for(let i=0;i<anchors.length-1;i++){
+  if(y>=anchors[i].at&&y<=anchors[i+1].at){a=anchors[i];b=anchors[i+1];break}
+ }
+ const t=(y-a.at)/Math.max(1,b.at-a.at);
+ const e=t<.5?2*t*t:1-((-2*t+2)**2)/2;
+ return {idx:a.idx+(b.idx-a.idx)*e,year:a.year+(b.year-a.year)*e,depth:a.depth+(b.depth-a.depth)*e};
+}
+window.dig={idx:-1.25,active:-1,mobile:false};
+let lastActive=-2;
+function update(){
+ const s=sample();
+ dig.idx=s.idx;dig.mobile=innerWidth<=820;
+ yearEl.textContent=fmtYear(s.year);
+ depthEl.textContent=s.depth<=0?'Superficie':'Profundidad −'+s.depth.toFixed(1).replace('.',',')+' m';
+ const act=Math.max(-1,Math.min(layers.length-1,Math.round(s.idx)));
+ dig.active=act;
+ if(act!==lastActive){links.forEach((l,i)=>i===act?l.setAttribute('aria-current','true'):l.removeAttribute('aria-current'));lastActive=act}
+ const bandH=innerHeight*.46;
+ strip.style.transform=`translateY(${innerHeight*.5-bandH*(s.idx+.5)}px)`;
+}
+measure();update();
+addEventListener('scroll',update,{passive:true});
+addEventListener('resize',()=>{measure();update()});
+addEventListener('load',()=>{measure();update()});
+
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in')}),{threshold:.25});
+secs.forEach(s=>io.observe(s));
+if(reduce) secs.forEach(s=>s.classList.add('in'));
+setTimeout(()=>{if(root.classList.contains('no-3d'))root.classList.add('ready')},1500);
+}
+</script>
+
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+{
+const root=document.documentElement;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const layers=[...document.querySelectorAll('main>section[data-color]')].map(s=>({color:s.dataset.color}));
+const canvas=document.getElementById('scene');
+let renderer;
+try{renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'low-power'})}catch(e){renderer=null}
+if(renderer){
+root.classList.remove('no-3d');root.classList.remove('ready');
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+const BG=new THREE.Color('#0B0A08');
+const scene=new THREE.Scene();scene.background=BG;scene.fog=new THREE.Fog(BG,8,22);
+const camera=new THREE.PerspectiveCamera(36,1,.1,60);
+const pmrem=new THREE.PMREMGenerator(renderer);
+scene.environment=pmrem.fromScene(new RoomEnvironment(),.04).texture;
+
+/* texturas */
+const manager=new THREE.LoadingManager();
+manager.onLoad=()=>root.classList.add('ready');
+manager.onError=()=>root.classList.add('ready');
+setTimeout(()=>root.classList.add('ready'),6000);
+const loader=new THREE.TextureLoader(manager);
+const maxAniso=Math.min(8,renderer.capabilities.getMaxAnisotropy());
+function T(name,rx=1,ry=1,srgb=true){const t=loader.load('tex/'+name+'.jpg');t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(rx,ry);t.anisotropy=maxAniso;if(srgb)t.colorSpace=THREE.SRGBColorSpace;return t}
+const mats=[];
+function M(opts){const m=new THREE.MeshStandardMaterial(opts);mats.push(m);return m}
+function P(opts){const m=new THREE.MeshPhysicalMaterial(opts);mats.push(m);return m}
+const tm=(name,rx,ry,extra={})=>M({map:T(name+'_c',rx,ry),normalMap:T(name+'_n',rx,ry,false),normalScale:new THREE.Vector2(1.3,1.3),roughness:.93,metalness:0,...extra});
+
+/* ruido para bordes irregulares */
+function hash(x,y,z){let h=Math.sin(x*127.1+y*311.7+z*74.7)*43758.5453;return h-Math.floor(h)}
+function noise(x,y,z){const ix=Math.floor(x),iy=Math.floor(y),iz=Math.floor(z),fx=x-ix,fy=y-iy,fz=z-iz;
+ const u=fx*fx*(3-2*fx),v=fy*fy*(3-2*fy),w=fz*fz*(3-2*fz);let r=0;
+ for(let a=0;a<2;a++)for(let b=0;b<2;b++)for(let c=0;c<2;c++)r+=hash(ix+a,iy+b,iz+c)*(a?u:1-u)*(b?v:1-v)*(c?w:1-w);return r*2-1}
+const fbm3=(x,y,z)=>noise(x,y,z)*.6+noise(x*2.3,y*2.3,z*2.3)*.3+noise(x*5.1,y*5.1,z*5.1)*.1;
+
+/* columna */
+const H=2.4,W=3,hw=W/2;
+const column=new THREE.Group();scene.add(column);
+const centerY=i=>-(i*H+H/2);
+layers.forEach((L,i)=>{
+ const geo=new THREE.BoxGeometry(W,H,W,30,24,30);
+ const pos=geo.attributes.position,v=new THREE.Vector3();
+ for(let k=0;k<pos.count;k++){
+  v.fromBufferAttribute(pos,k);
+  const wy0=v.y+centerY(i);
+  const top=Math.abs(v.y-H/2)<1e-4,bot=Math.abs(v.y+H/2)<1e-4;
+  let wy=wy0;
+  if(top&&i>0) wy+=fbm3(v.x*.8,i*3.1,v.z*.8)*.32;
+  if(bot) wy+=fbm3(v.x*.8,(i+1)*3.1,v.z*.8)*.32;
+  const side=Math.abs(Math.abs(v.x)-hw)<1e-4||Math.abs(Math.abs(v.z)-hw)<1e-4;
+  if(side){const d=fbm3(v.x*1.7,wy*1.7,v.z*1.7)*.09+fbm3(v.x*6,wy*6,v.z*6)*.025;
+   const rx=Math.abs(v.x)>=Math.abs(v.z)-1e-4?Math.sign(v.x):0,rz=Math.abs(v.z)>=Math.abs(v.x)-1e-4?Math.sign(v.z):0;
+   v.x+=rx*d;v.z+=rz*d}
+  pos.setXYZ(k,v.x,wy-centerY(i),v.z);
+ }
+ geo.computeVertexNormals();
+ const big=[0,1,6,10].includes(i);const mesh=new THREE.Mesh(geo,big?tm('L'+i,1.05,.85):tm('L'+i,1.6,1.3));
+ mesh.position.y=centerY(i);mesh.castShadow=mesh.receiveShadow=true;column.add(mesh);
+});
+/* ciudad en lo alto */
+const city=new THREE.Group();column.add(city);
+const lime=tm('lime',.5,.5,{roughness:.88});
+const r=(s=>()=>{s=(s*16807)%2147483647;return s/2147483647})(7);
+for(let x=-1.25;x<=1.25;x+=.42)for(let z=-1.25;z<=1.25;z+=.42){
+ if(r()<.18)continue;const h=.15+r()*.45;
+ const b=new THREE.Mesh(new THREE.BoxGeometry(.36,h,.36),lime);b.position.set(x+(r()-.5)*.05,h/2,z);b.castShadow=b.receiveShadow=true;city.add(b);
+ if(r()<.35){const d=new THREE.Mesh(new THREE.SphereGeometry(.09,16,8,0,Math.PI*2,0,Math.PI/2),lime);d.position.set(b.position.x,h,z);city.add(d)}
+}
+const gold=M({color:0xd8a94a,metalness:1,roughness:.22});
+const lead=M({color:0x8a8e94,metalness:.85,roughness:.45});
+const dome=(rad,mat,x,z,base)=>{const d=new THREE.Mesh(new THREE.SphereGeometry(rad,48,24,0,Math.PI*2,0,Math.PI/2),mat);d.position.set(x,base,z);d.castShadow=true;city.add(d);
+ const drum=new THREE.Mesh(new THREE.CylinderGeometry(rad*1.02,rad*1.02,base,8),lime);drum.position.set(x,base/2,z);drum.castShadow=drum.receiveShadow=true;city.add(drum)};
+dome(.42,gold,.6,-.55,.55);dome(.34,lead,-.55,.35,.62);
+const wallMat=tm('L1',2,.4);
+[[0,1.46,0],[0,-1.46,0],[1.46,0,1],[-1.46,0,1]].forEach(([x,z,rot])=>{const w=new THREE.Mesh(new THREE.BoxGeometry(W+.04,.34,.14),wallMat);w.position.set(x,.17,z);w.rotation.y=rot*Math.PI/2;w.castShadow=w.receiveShadow=true;city.add(w)});
+
+/* hallazgos */
+const clay=tm('clay',1,1,{roughness:.85});
+const limeObj=tm('lime',1,1,{roughness:.9});
+const bronze=M({color:0x8a6a3a,metalness:1,roughness:.42});
+const lathe=(pts,mat,seg=48)=>new THREE.Mesh(new THREE.LatheGeometry(pts.map(p=>new THREE.Vector2(p[0],p[1])),seg),mat);
+const builders=[
+ ()=>new THREE.Mesh(new THREE.BoxGeometry(.9,.5,.55,4,4,4),tm('L0',.6,.4)),
+ ()=>{const g=new THREE.Group();const face=M({map:T('tile_c'),normalMap:T('tile_n',1,1,false),roughness:.12,metalness:0});
+  const side=M({color:0xd8cfb8,roughness:.7});
+  g.add(new THREE.Mesh(new THREE.BoxGeometry(.85,.85,.08),[side,side,side,side,face,side]));return g},
+ ()=>{const g=new THREE.Group();const bar=(w,h,x,y)=>{const b=new THREE.Mesh(new THREE.BoxGeometry(w,h,.07),bronze);b.position.set(x,y,0);g.add(b)};
+  bar(.15,.9,0,0);bar(.9,.15,0,0);[[-.28,.28],[.28,.28],[-.28,-.28],[.28,-.28]].forEach(([x,y])=>{bar(.045,.2,x,y);bar(.2,.045,x,y)});return g},
+ ()=>{const g=new THREE.Group();
+  const body=lathe([[0,0],[.18,0],[.3,.03],[.36,.09],[.34,.15],[.24,.2],[.1,.22],[.08,.25],[.05,.25],[.04,.2],[0,.2]],clay);g.add(body);
+  const nz=new THREE.Mesh(new THREE.CylinderGeometry(.08,.1,.32,20),clay);nz.rotation.z=Math.PI/2;nz.position.set(.42,.1,0);nz.scale.set(1,1,.75);g.add(nz);
+  const hole=new THREE.Mesh(new THREE.CircleGeometry(.035,16),M({color:0x1a0f08,roughness:1}));hole.rotation.x=-Math.PI/2;hole.position.set(.55,.15,0);g.add(hole);
+  const fl=new THREE.Mesh(new THREE.ConeGeometry(.04,.16,16),new THREE.MeshBasicMaterial({color:0xffc06a}));fl.position.set(.56,.25,0);g.add(fl);g.userData.flame=fl;
+  const pl=new THREE.PointLight(0xff9a40,1.2,1.6,2);pl.position.set(.56,.32,0);g.add(pl);return g},
+ ()=>{const g=new THREE.Group();const base=new THREE.Mesh(new THREE.BoxGeometry(1,.06,.7),limeObj);base.position.y=-.06;g.add(base);
+  const cols=[0xe6dcc4,0x9a3a28,0x2c2a26,0xc99a4a,0xd9cdb0,0x7a7f6e];const rr=(s=>()=>{s=(s*16807)%2147483647;return s/2147483647})(3);
+  const tm2=cols.map(c=>M({color:c,roughness:.55}));
+  for(let x=-.45;x<.45;x+=.075)for(let z=-.3;z<.3;z+=.075){if(rr()<.25)continue;
+   const c=new THREE.Mesh(new THREE.BoxGeometry(.065,.06,.065),tm2[(Math.floor((x+.5)*6)+Math.floor((z+.5)*4))%6]);c.position.set(x+(rr()-.5)*.01,.0+(rr()-.5)*.012,z);c.rotation.y=(rr()-.5)*.2;g.add(c)}
+  g.rotation.x=.9;const w=new THREE.Group();w.add(g);return w},
+ ()=>{const face=M({map:T('coin_c'),normalMap:T('coin_n',1,1,false),normalScale:new THREE.Vector2(1.6,1.6),metalness:.9,roughness:.45});
+  const m=new THREE.Mesh(new THREE.CylinderGeometry(.42,.42,.055,64),[bronze,face,face]);m.rotation.x=Math.PI/2;const g=new THREE.Group();g.add(m);return g},
+ ()=>{const g=new THREE.Group();const st=tm('L6',.5,.25);for(let i=0;i<4;i++){const s=new THREE.Mesh(new THREE.BoxGeometry(1,.16,.3),st);s.position.set(0,i*.16-.24,-i*.22+.33);s.castShadow=true;g.add(s)}return g},
+ ()=>{const bm=T('bulla_c'),bn=T('bulla_n',1,1,false);[bm,bn].forEach(x=>{x.center.set(.5,.5);x.rotation=Math.PI/2});const face=M({map:bm,normalMap:bn,normalScale:new THREE.Vector2(2,2),roughness:.8});
+  const side=M({color:0x3a2418,roughness:.9});
+  const geo=new THREE.CylinderGeometry(.34,.3,.09,48,1);const m=new THREE.Mesh(geo,[side,face,side]);m.rotation.x=Math.PI/2;m.scale.set(1,1,.82);const g=new THREE.Group();g.add(m);return g},
+ ()=>{const curve=new THREE.CatmullRomCurve3([[-.6,.3,0],[-.3,.35,.25],[0,.1,-.2],[.25,-.15,.25],[.6,-.3,0]].map(p=>new THREE.Vector3(...p)));
+  const g=new THREE.Group();
+  g.add(new THREE.Mesh(new THREE.TubeGeometry(curve,80,.075,14,false),P({color:0x6fb4bc,roughness:.05,transmission:.85,thickness:.3,ior:1.33,emissive:0x0d3238,emissiveIntensity:.6})));
+  const rock=new THREE.Mesh(new THREE.TubeGeometry(curve,80,.12,14,false),tm('L8',3,.5,{transparent:true,opacity:.35,depthWrite:false}));g.add(rock);return g},
+ ()=>{const g=new THREE.Group();const st=tm('L9',.6,.3);for(let i=0;i<5;i++){const s=new THREE.Mesh(new THREE.BoxGeometry(1-i*.17,.17,.7-i*.1),st);s.position.y=i*.17-.34;s.castShadow=true;g.add(s)}return g},
+ ()=>new THREE.Mesh(new THREE.BoxGeometry(1,.62,.62,4,4,4),tm('L10',.5,.35)),
+ ()=>{const g=new THREE.Group();const wm=P({color:0x7cc4cc,roughness:.03,transmission:.92,thickness:.6,ior:1.33,emissive:0x0f3a40,emissiveIntensity:.5});
+  const drop=new THREE.Mesh(new THREE.SphereGeometry(.3,48,32),wm);g.add(drop);
+  const tip=new THREE.Mesh(new THREE.ConeGeometry(.262,.42,48,1,true),wm);tip.position.y=.36;g.add(tip);
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(.5,.012,8,64),new THREE.MeshBasicMaterial({color:0x8fd3da,transparent:true,opacity:.5}));ring.rotation.x=Math.PI/2;ring.position.y=-.3;g.add(ring);g.userData.ring=ring;return g},
+];
+const tilts=[.3,0,0,.6,0,0,.25,0,.35,.3,.3,0];
+const finds=builders.map((b,i)=>{const o=b();o.traverse(c=>{if(c.isMesh)c.castShadow=true});o.position.y=centerY(i);o.scale.setScalar(.001);o.userData.s=0;scene.add(o);return o});
+const pool=new THREE.Mesh(new THREE.CircleGeometry(1.2,48),P({color:0x2a5860,roughness:.04,metalness:.1,emissive:0x153d44,emissiveIntensity:.7}));
+pool.rotation.x=-Math.PI/2;pool.position.y=-layers.length*H-.2;column.add(pool);
+const spring=new THREE.PointLight(0x6fc6d0,0,7,1.4);spring.position.set(0,-layers.length*H+1.2,2.2);column.add(spring);
+
+/* luz */
+const amb=new THREE.AmbientLight(0xfff0d8,.6);scene.add(amb);
+const sun=new THREE.DirectionalLight(0xffe2b8,3);sun.position.set(-4,9,6);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);
+Object.assign(sun.shadow.camera,{left:-3,right:3,top:3,bottom:-3,near:1,far:20});sun.shadow.bias=-.0008;scene.add(sun);scene.add(sun.target);
+const lamp=new THREE.SpotLight(0xffb866,60,16,.55,.55,1.6);lamp.castShadow=true;lamp.shadow.mapSize.set(1024,1024);lamp.shadow.bias=-.0006;lamp.shadow.normalBias=.02;
+scene.add(lamp);scene.add(lamp.target);
+const fill=new THREE.PointLight(0xffc98a,4,10,1.8);scene.add(fill);
+
+/* polvo */
+const N=420,pos=new Float32Array(N*3),pr=(s=>()=>{s=(s*16807)%2147483647;return s/2147483647})(5);
+for(let i=0;i<N;i++){pos[i*3]=(pr()-.5)*10;pos[i*3+1]=(pr()-.5)*8;pos[i*3+2]=(pr()-.5)*6}
+const dustGeo=new THREE.BufferGeometry();dustGeo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+const dust=new THREE.Points(dustGeo,new THREE.PointsMaterial({color:0xd9b77a,size:.022,transparent:true,opacity:.5,depthWrite:false}));
+scene.add(dust);
+
+/* cámara y bucle */
+let camY=2.4,mx=0,my=0,visible=true,running=true;
+addEventListener('pointermove',e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5},{passive:true});
+function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
+resize();addEventListener('resize',resize);
+document.addEventListener('visibilitychange',()=>{visible=!document.hidden;if(visible&&!running){running=true;requestAnimationFrame(loop)}});
+const clock=new THREE.Clock();
+function loop(){
+ if(!visible){running=false;return}
+ const dt=Math.min(clock.getDelta(),.1),t=clock.elapsedTime;const k=reduce?1:1-Math.exp(-dt*4.2);
+ const d=window.dig||{idx:-1.25,active:-1,mobile:false};
+ const target=d.idx<0?centerY(0)+(-d.idx)*2.6:centerY(Math.min(d.idx,layers.length-1+.35));
+ camY+=(target-camY)*k;
+ const mob=d.mobile;
+ const colX=mob?0:2.55;
+ column.position.x=colX;
+ column.rotation.y=reduce?.35:.35+Math.sin(t*.12)*.08+mx*.18;
+ const depth=Math.max(0,-camY/(layers.length*H));
+ const oy=mob?-1.9:0;
+ camera.position.set(mob?0:-.2,camY+.5+oy+my*-.3,mob?15:10.4);
+ camera.lookAt(mob?0:1.25,camY-.05+oy,0);
+ const day=Math.max(0,1-depth*3.2);
+ amb.intensity=.55*(1-depth)**2+.05;
+ sun.intensity=3.2*day;sun.position.set(colX-4,camY+9,6);sun.target.position.set(colX,camY,0);sun.castShadow=day>.05;
+ const flick=Math.sin(t*7)*.04+Math.sin(t*3.1)*.05;
+ lamp.position.set(colX-2.6,camY+1.6,4.2);lamp.target.position.set(colX-.3,camY-.2,0);
+ lamp.intensity=(25+depth*90)*(1+flick);
+ fill.position.set(colX+1.5,camY-.5,3.5);fill.intensity=2+depth*5;
+ const env=.55*(1-depth)+.12;for(const m of mats)m.envMapIntensity=env;
+ spring.intensity=Math.max(0,(depth-.74)*140);
+ scene.fog.near=7+(1-depth)*3;scene.fog.far=17+(1-depth)*6;
+ finds.forEach((f,i)=>{
+  const on=i===d.active;
+  f.userData.s+=((on?1:0)-f.userData.s)*k;
+  const s=Math.max(.001,f.userData.s)*(mob?.75:1.15);f.scale.setScalar(s);f.visible=f.userData.s>.01;
+  f.position.x=mob?.6:colX-1.05;f.position.z=mob?3:2.4;
+  f.position.y=centerY(i)+(mob?1.1:.15)+Math.sin(t*.8+i)*.06;
+  f.rotation.y=reduce?-.35:-.35+Math.sin(t*.35+i)*.6;f.rotation.x=(tilts[i]||0)+(reduce?0:Math.sin(t*.4)*.08);
+  if(f.userData.ring){const k=1+(t*.6%1)*.8;f.userData.ring.scale.setScalar(k);f.userData.ring.material.opacity=.6*(1-(t*.6%1))}
+  if(f.userData.flame)f.userData.flame.scale.set(1,.85+Math.sin(t*13)*.18,1);
+ });
+ const p=dustGeo.attributes.position;
+ for(let i=0;i<N;i++){let y=p.array[i*3+1]-(reduce?0:.002);if(y<-4)y=4;p.array[i*3+1]=y}
+ p.needsUpdate=true;dust.position.set(colX-.5,camY,0);
+ renderer.render(scene,camera);
+ requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+}
+}
+</script>
+</body>
+</html>
