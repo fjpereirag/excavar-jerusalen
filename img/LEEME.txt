@@ -1,0 +1,4 @@
+Pon aquí tus propias imágenes (por ejemplo, hechas con IA) para sustituir las reconstrucciones 3D.
+Nombres: capa-0.jpg (hoy) ... capa-11.jpg (manantial), capa-12.jpg (nueva Jerusalén).
+Formato recomendado: JPG horizontal 5:3, por ejemplo 1200 x 720 px.
+Si falta una imagen, la web usa la reconstrucción 3D de esa capa.
